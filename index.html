@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmConnect — Farmer Dashboard, Disease Detection & Market Connect</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f6ef;
+  color: #243b2c;
+}
+
+header {
+  background: #174d32;
+  color: white;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+header h2 { font-size: 22px; }
+
+header button {
+  background: #d9eea9;
+  color: #174d32;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 7px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+nav {
+  background: #23633f;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+nav button {
+  background: transparent;
+  color: white;
+  border: 1px solid #6a9777;
+  padding: 10px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+nav button:hover { background: #398253; }
+nav button.active { background: #d9eea9; color: #174d32; }
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+.welcome {
+  background: linear-gradient(120deg, #dceecb, #f6f8e9);
+  border-radius: 15px;
+  padding: 28px;
+  margin-bottom: 22px;
+}
+
+.welcome h1 { font-size: 28px; margin-bottom: 10px; }
+.welcome p { color: #526b55; line-height: 1.7; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e3eadd;
+  box-shadow: 0 3px 12px #203d2010;
+  margin-bottom: 18px;
+}
+
+.stat-number {
+  font-size: 26px;
+  font-weight: bold;
+  color: #267443;
+  margin: 10px 0;
+}
+
+h2.section-title { font-size: 24px; margin-bottom: 16px; }
+
+.tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.tool {
+  background: white;
+  border: 1px solid #e3eadd;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.tool .emoji { font-size: 33px; margin-bottom: 10px; }
+.tool p { color: #6c7b6d; line-height: 1.6; margin: 10px 0; }
+
+button.action {
+  background: #236b40;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button.action:hover { background: #174d32; }
+button.secondary { background: #e8f2e1; color: #236b40; }
+
+form { max-width: 750px; }
+
+.field { margin-bottom: 15px; }
+
+.field label {
+  display: block;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd9c9;
+  border-radius: 7px;
+  background: white;
+}
+
+.crop-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.crop-options label {
+  background: #f2f7ed;
+  border: 1px solid #dce8d5;
+  padding: 13px;
+  border-radius: 8px;
+}
+
+.message {
+  padding: 12px;
+  margin-top: 14px;
+  background: #e4f3dd;
+  border-radius: 8px;
+  display: none;
+}
+
+.upload-box {
+  border: 2px dashed #9cbd91;
+  border-radius: 12px;
+  padding: 22px 15px;
+  text-align: center;
+  background: #fafcf8;
+}
+
+.upload-box .icon { font-size: 42px; margin-bottom: 10px; }
+
+input[type="file"] {
+  display: block;
+  width: 100%;
+  margin: 15px 0;
+}
+
+#preview {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 10px;
+  margin-top: 12px;
+  display: none;
+}
+
+.result-box {
+  padding: 15px;
+  background: #f2f8ec;
+  border-radius: 10px;
+  margin-top: 14px;
+  line-height: 1.7;
+}
+
+.warning {
+  background: #fff4dc;
+  color: #795b22;
+  padding: 13px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  font-size: 14px;
+}
+
+th { background: #e8f5e9; }
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.PENDING { background: #fff3e0; color: #e65100; }
+.CONFIRMED { background: #e3f2fd; color: #0d47a1; }
+.DISPATCHED { background: #ede7f6; color: #4527a0; }
+.DELIVERED { background: #e8f5e9; color: #1b5e20; }
+.CANCELLED { background: #ffebee; color: #b71c1c; }
+
+#authScreen {
+  max-width: 430px;
+  margin: 60px auto;
+}
+
+#authScreen .card { padding: 26px; }
+#authScreen h1 { margin-bottom: 10px; }
+#authScreen p { color: #68786b; line-height: 1.6; margin-bottom: 18px; }
+
+footer {
+  text-align: center;
+  color: #728273;
+  font-size: 13px;
+  padding: 24px;
+}
+
+@media(max-width:600px) {
+  .container { padding: 15px; }
+  .welcome h1 { font-size: 23px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="authScreen">
+  <div class="card">
+    <h1>🌱 FarmConnect</h1>
+    <p>Farmer Dashboard, AI Disease Detection and Market Connect</p>
+
+    <form id="authForm">
+      <div class="field">
+        <label>Full Name</label>
+        <input id="authName" required placeholder="Enter your name">
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="authEmail" type="email" required placeholder="farmer@example.com">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="authPassword" type="password" minlength="4" required placeholder="Enter password">
+      </div>
+
+      <button class="action" type="submit">Register / Login</button>
+    </form>
+
+    <div class="message" id="authMessage"></div>
+    <p style="font-size:12px;margin-top:16px">
+      Demo login only. Data is stored in this browser using localStorage.
+    </p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
+
+<header>
+  <h2>🌱 FarmConnect</h2>
+  <div>
+    <span id="headerName">Farmer</span>
+    <button onclick="logout()">Log Out</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('home', this)">🏠 Dashboard</button>
+  <button onclick="showSection('profile', this)">👨‍🌾 Profile</button>
+  <button onclick="showSection('farm', this)">🌾 Farm</button>
+  <button onclick="showSection('crops', this)">🌱 Crops</button>
+  <button onclick="showSection('disease', this)">🔬 Disease Detection</button>
+  <button onclick="showSection('market', this)">🛒 Market Connect</button>
+  <button onclick="showSection('orders', this)">📦 Orders</button>
+</nav>
+
+<main class="container">
+
+<!-- HOME -->
+<section id="home" class="section active">
+  <div class="welcome">
+    <h1>Welcome, <span id="welcomeName">Farmer</span>! 🌿</h1>
+    <p>Manage your farm, detect crop diseases, list produce, connect with buyers, compare market prices, and manage orders.</p>
+    <button class="action" onclick="showSection('market')">Open Market Connect →</button>
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <h3>🌾 Farm Size</h3>
+      <div class="stat-number"><span id="statSize">0</span> acres</div>
+      <p>Registered farm area</p>
+    </div>
+
+    <div class="card">
+      <h3>🌱 My Crops</h3>
+      <div class="stat-number" id="statCrops">0</div>
+      <p>Registered crop types</p>
+    </div>
+
+    <div class="card">
+      <h3>🛒 Market Listings</h3>
+      <div class="stat-number" id="statListings">0</div>
+      <p>Active crop listings</p>
+    </div>
+
+    <div class="card">
+      <h3>📦 Orders</h3>
+      <div class="stat-number" id="statOrders">0</div>
+      <p>Total orders received</p>
+    </div>
+  </div>
+
+  <h2 class="section-title">Farming Services</h2>
+
+  <div class="tools">
+    <div class="tool">
+      <div class="emoji">🔬</div>
+      <h3>Plant Disease Detection</h3>
+      <p>Upload a leaf image and analyze possible crop disease.</p>
+      <button class="action" onclick="showSection('disease')">Open Module</button>
+    </div>
+
+    <div class="tool">
+      <div class="emoji">🛒</div>
+      <h3>Farmer Market Connect</h3>
+      <p>List crops, connect buyers, compare prices and manage orders.</p>
+      <button class="action" onclick="showSection('market')">Explore Market</button>
+    </div>
+
+    <div class="tool">
+      <div class="emoji">🌦️</div>
+      <h3>Crop Advisory</h3>
+      <p>Plan irrigation and review crop-care guidance.</p>
+      <button class="action" onclick="alert('Connect a weather API to enable live advisories.')">View Advice</button>
+    </div>
+
+    <div class="tool">
+      <div class="emoji">💬</div>
+      <h3>Farmer Chatbot</h3>
+      <p>Ask farming questions and receive guidance.</p>
+      <button class="action" onclick="alert('Connect a chatbot backend to enable this service.')">Open Chatbot</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌿 Registered Crops</h3>
+    <div id="cropSummary">No crops registered yet.</div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="section">
+  <div class="card">
+    <h2 class="section-title">👨‍🌾 Farmer Profile</h2>
+
+    <form id="profileForm">
+      <div class="field"><label>Full Name</label><input id="fullName" required></div>
+      <div class="field"><label>Email Address</label><input id="email" type="email"></div>
+      <div class="field"><label>Phone Number</label><input id="phone" type="tel"></div>
+      <div class="field"><label>Village / Town</label><input id="village"></div>
+      <div class="field"><label>District</label><input id="district"></div>
+      <div class="field"><label>State</label><input id="state" value="Maharashtra"></div>
+
+      <button class="action" type="submit">Save Profile</button>
+    </form>
+
+    <div class="message" id="profileMessage"></div>
+  </div>
+</section>
+
+<!-- FARM -->
+<section id="farm" class="section">
+  <div class="card">
+    <h2 class="section-title">🌾 Farm Details</h2>
+
+    <form id="farmForm">
+      <div class="field"><label>Farm Name</label><input id="farmName" placeholder="My Green Farm"></div>
+      <div class="field"><label>Farm Size (Acres)</label><input id="farmSize" type="number" min="0" step="0.1" required></div>
+
+      <div class="field">
+        <label>Soil Type</label>
+        <select id="soil">
+          <option>Black Soil</option><option>Red Soil</option>
+          <option>Alluvial Soil</option><option>Sandy Soil</option>
+          <option>Clay Soil</option><option>Loamy Soil</option>
+          <option>Other / Not Sure</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Main Water Source</label>
+        <select id="water">
+          <option>Borewell</option><option>Well</option>
+          <option>Canal</option><option>Rainwater</option>
+          <option>River</option><option>Other</option>
+        </select>
+      </div>
+
+      <button class="action" type="submit">Save Farm Details</button>
+    </form>
+
+    <div class="message" id="farmMessage"></div>
+  </div>
+</section>
+
+<!-- CROPS -->
+<section id="crops" class="section">
+  <div class="card">
+    <h2 class="section-title">🌱 Select Your Crops</h2>
+
+    <form id="cropsForm">
+      <div class="crop-options">
+        <label><input type="checkbox" value="Tomato">🍅 Tomato</label>
+        <label><input type="checkbox" value="Onion">🧅 Onion</label>
+        <label><input type="checkbox" value="Grapes">🍇 Grapes</label>
+        <label><input type="checkbox" value="Wheat">🌾 Wheat</label>
+        <label><input type="checkbox" value="Rice">🌾 Rice</label>
+        <label><input type="checkbox" value="Maize">🌽 Maize</label>
+        <label><input type="checkbox" value="Soybean">🫘 Soybean</label>
+        <label><input type="checkbox" value="Cotton">☁️ Cotton</label>
+        <label><input type="checkbox" value="Sugarcane">🎋 Sugarcane</label>
+        <label><input type="checkbox" value="Potato">🥔 Potato</label>
+        <label><input type="checkbox" value="Chilli">🌶️ Chilli</label>
+        <label><input type="checkbox" value="Pomegranate">🍎 Pomegranate</label>
+      </div>
+
+      <button class="action" type="submit">Save Selected Crops</button>
+    </form>
+
+    <div class="message" id="cropsMessage"></div>
+  </div>
+</section>
+
+<!-- DISEASE DETECTION -->
+<section id="disease" class="section">
+  <div class="card">
+    <h2 class="section-title">🍃 AI Plant Disease Detection</h2>
+
+    <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px">
+
+      <div class="card">
+        <h3>📸 Upload Crop Image</h3>
+
+        <div class="upload-box">
+          <div class="icon">🌿</div>
+          <strong>Select a plant leaf image</strong>
+          <input type="file" id="imageInput" accept="image/*" capture="environment">
+          <img id="preview" alt="Leaf preview">
+        </div>
+
+        <div class="field">
+          <label>Select Crop Type</label>
+          <select id="cropType">
+            <option value="">-- Choose Crop --</option>
+            <option>Tomato</option><option>Potato</option>
+            <option>Apple</option><option>Grapes</option>
+            <option>Maize</option><option>Rice</option>
+            <option>Wheat</option><option>Chilli</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <button class="action" id="analyzeButton" style="width:100%">🔬 Analyze Plant</button>
+        <button class="action secondary" id="clearButton" style="width:100%;margin-top:10px">Clear Image</button>
+
+        <p class="message" id="diseaseStatus"></p>
+      </div>
+
+      <div class="card">
+        <h3>🔍 Disease Analysis</h3>
+
+        <div id="emptyResult" class="result-box">
+          <strong>Waiting for image analysis</strong>
+          <p>Upload an image and click Analyze Plant.</p>
+        </div>
+
+        <div id="results" style="display:none">
+          <div class="result-box">
+            <strong>Prediction:</strong>
+            <p id="diseaseName">No prediction</p>
+
+            <strong>Confidence:</strong>
+            <p id="confidence">Not available</p>
+
+            <strong>Crop:</strong>
+            <p id="detectedCrop">Not available</p>
+          </div>
+
+          <div class="result-box">
+            <strong>🌱 Suggested next steps</strong>
+            <ul id="treatment" style="padding-left:20px"></ul>
+          </div>
+        </div>
+
+        <div class="warning">
+          This demo uses a simple offline image-check rule, not a trained CNN model.
+          Connect a real model backend for accurate diagnosis, and consult an agricultural expert before applying pesticides.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MARKET CONNECT -->
+<section id="market" class="section">
+  <div class="card">
+    <h2 class="section-title">🛒 Farmer Market Connect</h2>
+    <p>Add crop listings, connect with buyers, compare market prices, and manage orders.</p>
+  </div>
+
+  <div class="card">
+    <h3>➕ Add Crop Listing</h3>
+
+    <form id="listingForm">
+      <div class="field"><label>Crop Name</label><input id="listingCrop" required></div>
+      <div class="field"><label>Variety</label><input id="listingVariety" placeholder="Optional"></div>
+
+      <div class="field">
+        <label>Quantity</label>
+        <input id="listingQuantity" type="number" min="0.01" step="0.01" required>
+      </div>
+
+      <div class="field">
+        <label>Unit</label>
+        <select id="listingUnit">
+          <option>kg</option><option>quintal</option>
+          <option>bag</option><option>tonne</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Price per Unit (₹)</label>
+        <input id="listingPrice" type="number" min="0.01" step="0.01" required>
+      </div>
+
+      <div class="field"><label>Location</label><input id="listingLocation" required></div>
+
+      <button class="action" type="submit">Add Listing</button>
+    </form>
+
+    <div class="message" id="listingMessage"></div>
+  </div>
+
+  <div class="card">
+    <h3>🌾 Available Crop Listings</h3>
+
+    <div class="field">
+      <label>Search Crop</label>
+      <input id="listingSearch" oninput="renderListings()" placeholder="Tomato, onion, wheat...">
+    </div>
+
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Crop</th><th>Farmer</th><th>Location</th>
+            <th>Available</th><th>Price</th><th>Order</th>
+          </tr>
+        </thead>
+        <tbody id="listingTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Compare Market Prices</h3>
+
+    <div class="field">
+      <label>Select Crop</label>
+      <select id="priceCrop" onchange="renderPrices()">
+        <option value="">-- Choose Crop --</option>
+      </select>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th>Market</th><th>Min Price</th><th>Max Price</th><th>Modal Price</th></tr>
+        </thead>
+        <tbody id="priceTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ORDERS -->
+<section id="orders" class="section">
+  <div class="card">
+    <h2 class="section-title">📦 Order Management</h2>
+    <p>Buyers place orders from listings. Farmers can update order status.</p>
+  </div>
+
+  <div class="card">
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Order</th><th>Crop</th><th>Buyer</th><th>Quantity</th>
+            <th>Total</th><th>Status</th><th>Update</th>
+          </tr>
+        </thead>
+        <tbody id="orderTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  FarmConnect | Farmer Dashboard + AI Disease Detection + Market Connect
+</footer>
+</div>
+
+<script>
+const STORAGE_KEY = "farmConnectCompleteData";
+
+const defaultData = {
+  name: "", email: "", phone: "", village: "", district: "", state: "Maharashtra",
+  farmName: "", farmSize: 0, soil: "Black Soil", water: "Borewell", crops: [],
+  listings: [], orders: []
+};
+
+let data = structuredClone(defaultData);
+
+const marketPrices = {
+  Tomato: [
+    { market: "Nashik APMC", min: 20, max: 28, modal: 24 },
+    { market: "Mumbai Market", min: 22, max: 31, modal: 27 }
+  ],
+  Onion: [
+    { market: "Nashik APMC", min: 24, max: 32, modal: 28 },
+    { market: "Delhi Azadpur", min: 26, max: 35, modal: 30 }
+  ],
+  Wheat: [
+    { market: "Lucknow Mandi", min: 28, max: 35, modal: 31 },
+    { market: "Kanpur Mandi", min: 29, max: 36, modal: 33 }
+  ],
+  Potato: [
+    { market: "Lucknow Mandi", min: 15, max: 22, modal: 18 },
+    { market: "Agra Mandi", min: 16, max: 23, modal: 19 }
+  ]
+};
+
+function loadData() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    data = { ...structuredClone(defaultData), ...saved };
+    if (!Array.isArray(data.crops)) data.crops = [];
+    if (!Array.isArray(data.listings)) data.listings = [];
+    if (!Array.isArray(data.orders)) data.orders = [];
+  } catch {
+    data = structuredClone(defaultData);
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function showMessage(id, text) {
+  const box = document.getElementById(id);
+  box.textContent = text;
+  box.style.display = "block";
+  setTimeout(() => box.style.display = "none", 3500);
+}
+
+function showSection(id, button = null) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+
+  document.getElementById(id).classList.add("active");
+  if (button) button.classList.add("active");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (id === "market") {
+    renderListings();
+    renderPrices();
+  }
+
+  if (id === "orders") renderOrders();
+  if (id === "home") updateDashboard();
+}
+
+function loginDemo() {
+  document.getElementById("authScreen").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  fillForms();
+  updateDashboard();
+  renderListings();
+  renderPrices();
+  renderOrders();
+}
+
+document.getElementById("authForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  data.name = document.getElementById("authName").value.trim();
+  data.email = document.getElementById("authEmail").value.trim();
+  saveData();
+
+  sessionStorage.setItem("farmConnectLoggedIn", "yes");
+  loginDemo();
+});
+
+function logout() {
+  sessionStorage.removeItem("farmConnectLoggedIn");
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("authScreen").style.display = "block";
+}
+
+function fillForms() {
+  document.getElementById("fullName").value = data.name || "";
+  document.getElementById("email").value = data.email || "";
+  document.getElementById("phone").value = data.phone || "";
+  document.getElementById("village").value = data.village || "";
+  document.getElementById("district").value = data.district || "";
+  document.getElementById("state").value = data.state || "Maharashtra";
+
+  document.getElementById("farmName").value = data.farmName || "";
+  document.getElementById("farmSize").value = data.farmSize || 0;
+  document.getElementById("soil").value = data.soil;
+  document.getElementById("water").value = data.water;
+
+  document.querySelectorAll("#cropsForm input").forEach(input => {
+    input.checked = data.crops.includes(input.value);
+  });
+}
+
+document.getElementById("profileForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  data.name = document.getElementById("fullName").value.trim();
+  data.email = document.getElementById("email").value.trim();
+  data.phone = document.getElementById("phone").value.trim();
+  data.village = document.getElementById("village").value.trim();
+  data.district = document.getElementById("district").value.trim();
+  data.state = document.getElementById("state").value.trim();
+
+  saveData();
+  updateDashboard();
+  showMessage("profileMessage", "Farmer profile saved successfully!");
+});
+
+document.getElementById("farmForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  data.farmName = document.getElementById("farmName").value.trim();
+  data.farmSize = Number(document.getElementById("farmSize").value);
+  data.soil = document.getElementById("soil").value;
+  data.water = document.getElementById("water").value;
+
+  saveData();
+  updateDashboard();
+  showMessage("farmMessage", "Farm details saved successfully!");
+});
+
+document.getElementById("cropsForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  data.crops = [...document.querySelectorAll("#cropsForm input:checked")]
+    .map(input => input.value);
+
+  saveData();
+  updateDashboard();
+  showMessage("cropsMessage", "Your crop selection has been saved!");
+});
+
+function updateDashboard() {
+  document.getElementById("headerName").textContent = data.name || "Farmer";
+  document.getElementById("welcomeName").textContent = (data.name || "Farmer").split(" ")[0];
+
+  document.getElementById("statSize").textContent = data.farmSize || 0;
+  document.getElementById("statCrops").textContent = data.crops.length;
+  document.getElementById("statListings").textContent = data.listings.length;
+  document.getElementById("statOrders").textContent = data.orders.length;
+
+  const summary = document.getElementById("cropSummary");
+
+  summary.textContent = data.crops.length === 0
+    ? "No crops registered yet. Open My Crops to add crops."
+    : data.crops.map(crop => "🌱 " + crop).join("   ");
+}
+
+/* Disease detection demo */
+const imageInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+let selectedImage = null;
+
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Please choose a valid image.");
+    imageInput.value = "";
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    alert("Image must be smaller than 10 MB.");
+    imageInput.value = "";
+    return;
+  }
+
+  selectedImage = file;
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+
+  const status = document.getElementById("diseaseStatus");
+  status.textContent = "Image selected: " + file.name;
+  status.style.display = "block";
+});
+
+document.getElementById("clearButton").addEventListener("click", () => {
+  selectedImage = null;
+  imageInput.value = "";
+  preview.src = "";
+  preview.style.display = "none";
+
+  document.getElementById("emptyResult").style.display = "block";
+  document.getElementById("results").style.display = "none";
+
+  const status = document.getElementById("diseaseStatus");
+  status.textContent = "Please select a crop image to begin.";
+  status.style.display = "block";
+});
+
+document.getElementById("analyzeButton").addEventListener("click", () => {
+  const crop = document.getElementById("cropType").value;
+
+  if (!selectedImage) return alert("Please upload a plant leaf image.");
+  if (!crop) return alert("Please select a crop type.");
+
+  const result = analyzeLeafImage(selectedImage, crop);
+
+  document.getElementById("emptyResult").style.display = "none";
+  document.getElementById("results").style.display = "block";
+
+  document.getElementById("diseaseName").textContent = result.disease;
+  document.getElementById("confidence").textContent = result.confidence + "%";
+  document.getElementById("detectedCrop").textContent = crop;
+
+  const list = document.getElementById("treatment");
+  list.replaceChildren();
+
+  result.treatment.forEach(tip => {
+    const li = document.createElement("li");
+    li.textContent = tip;
+    list.appendChild(li);
+  });
+
+  const status = document.getElementById("diseaseStatus");
+  status.textContent = "Analysis completed.";
+  status.style.display = "block";
+});
+
+function analyzeLeafImage(file, crop) {
+  // Demo-only heuristic. Replace with a real CNN API for accurate results.
+  const name = file.name.toLowerCase();
+  const yellow = name.includes("yellow") || name.includes("leaf");
+  const spot = name.includes("spot") || name.includes("blight");
+
+  if (spot) {
+    return {
+      disease: "Possible Leaf Spot / Early Blight",
+      confidence: 78.5,
+      treatment: [
+        "Remove and destroy severely affected leaves.",
+        "Avoid overhead irrigation to reduce leaf wetness.",
+        "Use a recommended fungicide only after expert confirmation.",
+        "Rotate crops and maintain field sanitation."
+      ]
+    };
+  }
+
+  if (yellow) {
+    return {
+      disease: "Possible Nutrient Deficiency / Yellowing",
+      confidence: 72.0,
+      treatment: [
+        "Check soil moisture and drainage.",
+        "Test soil for nitrogen, magnesium and micronutrients.",
+        "Apply balanced fertilizer as per soil-test recommendation.",
+        "Monitor new leaves for improvement."
+      ]
+    };
+  }
+
+  return {
+    disease: "No clear disease pattern detected",
+    confidence: 61.0,
+    treatment: [
+      "Retake the photo in good daylight with the affected area clearly visible.",
+      "Compare symptoms with local crop-disease advisories.",
+      "Consult a nearby agricultural officer before treatment."
+    ]
+  };
+}
+
+/* Market Connect */
+document.getElementById("listingForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const crop = document.getElementById("listingCrop").value.trim();
+  const quantity = Number(document.getElementById("listingQuantity").value);
+  const price = Number(document.getElementById("listingPrice").value);
+  const location = document.getElementById("listingLocation").value.trim();
+
+  if (!crop || quantity <= 0 || price <= 0 || !location) {
+    return showMessage("listingMessage", "Please enter valid crop, quantity, price and location.");
+  }
+
+  data.listings.push({
+    id: Date.now(),
+    crop,
+    variety: document.getElementById("listingVariety").value.trim(),
+    quantity,
+    unit: document.getElementById("listingUnit").value,
+    price,
+    location,
+    farmer: data.name || "Demo Farmer",
+    available: true
+  });
+
+  saveData();
+  e.target.reset();
+  renderListings();
+  renderPrices();
+  updateDashboard();
+  showMessage("listingMessage", "Crop listing added successfully!");
+});
+
+function renderListings() {
+  const search = document.getElementById("listingSearch").value.toLowerCase();
+  const tbody = document.getElementById("listingTable");
+  tbody.replaceChildren();
+
+  const rows = data.listings.filter(l =>
+    l.available && l.crop.toLowerCase().includes(search)
+  );
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6">No active listings found.</td></tr>`;
+    return;
+  }
+
+  rows.forEach(listing => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td><strong>${listing.crop}</strong><br><small>${listing.variety || "Standard"}</small></td>
+      <td>${listing.farmer}</td>
+      <td>${listing.location}</td>
+      <td>${listing.quantity} ${listing.unit}</td>
+      <td>₹${listing.price} / ${listing.unit}</td>
+      <td>
+        <button class="action" onclick="openOrderForm(${listing.id})">Order</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function openOrderForm(listingId) {
+  const listing = data.listings.find(l => l.id === listingId);
+  if (!listing) return;
+
+  const buyer = prompt("Enter buyer name:", "GreenMart Retail");
+  if (!buyer) return;
+
+  const quantity = Number(prompt(
+    `Enter quantity in ${listing.unit} (available: ${listing.quantity}):`, ""
+  ));
+
+  if (!quantity || quantity <= 0 || quantity > listing.quantity) {
+    return alert(`Enter a quantity between 0 and ${listing.quantity} ${listing.unit}.`);
+  }
+
+  const total = quantity * listing.price;
+
+  data.orders.push({
+    id: Date.now(),
+    listingId,
+    crop: listing.crop,
+    unit: listing.unit,
+    buyer,
+    farmer: listing.farmer,
+    quantity,
+    total,
+    status: "PENDING"
+  });
+
+  listing.quantity -= quantity;
+  if (listing.quantity <= 0) listing.available = false;
+
+  saveData();
+  renderListings();
+  renderOrders();
+  updateDashboard();
+
+  alert(`Order placed successfully.\nTotal amount: ₹${total.toFixed(2)}`);
+}
+
+function renderPrices() {
+  const crop = document.getElementById("priceCrop").value;
+  const tbody = document.getElementById("priceTable");
+  tbody.replaceChildren();
+
+  const cropSelect = document.getElementById("priceCrop");
+  const knownCrops = new Set([...Object.keys(marketPrices)]);
+
+  data.listings.forEach(l => knownCrops.add(l.crop));
+
+  const current = cropSelect.value;
+  cropSelect.innerHTML = `<option value="">-- Choose Crop --</option>`;
+
+  [...knownCrops].sort().forEach(name => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    cropSelect.appendChild(option);
+  });
+
+  cropSelect.value = current;
+
+  const prices = crop ? (marketPrices[crop] || []) : [];
+
+  if (prices.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">No market-price data available.</td></tr>`;
+    return;
+  }
+
+  prices.forEach(price => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${price.market}</td>
+      <td>₹${price.min}</td>
+      <td>₹${price.max}</td>
+      <td><strong>₹${price.modal}</strong></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderOrders() {
+  const tbody = document.getElementById("orderTable");
+  tbody.replaceChildren();
+
+  if (data.orders.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7">No orders yet.</td></tr>`;
+    return;
+  }
+
+  [...data.orders].reverse().forEach(order => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>#${order.id}</td>
+      <td>${order.crop}</td>
+      <td>${order.buyer}</td>
+      <td>${order.quantity} ${order.unit}</td>
+      <td>₹${order.total.toFixed(2)}</td>
+      <td><span class="badge ${order.status}">${order.status}</span></td>
+      <td>
+        <select onchange="updateOrderStatus(${order.id}, this.value)">
+          ${["PENDING","CONFIRMED","DISPATCHED","DELIVERED","CANCELLED"]
+            .map(status => `<option value="${status}" ${status === order.status ? "selected" : ""}>${status}</option>`)
+            .join("")}
+        </select>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function updateOrderStatus(orderId, status) {
+  const order = data.orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  order.status = status;
+  saveData();
+  renderOrders();
+}
+
+loadData();
+
+if (sessionStorage.getItem("farmConnectLoggedIn") === "yes") {
+  loginDemo();
+}
+</script>
+
+</body>
+</html>
